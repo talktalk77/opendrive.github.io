@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>파일 이동 중...</title>
+<meta name="generator" content="Namo WebEditor(Trial)">
+</head>
+<body>
+  <p>잠시 후 파일로 이동합니다...</p>
+  <script>
+    // ===== 설정 =====
+    const username = "your_opendrive_username";
+    const password = "your_opendrive_password";
+    const fileId = "your_file_id_here";
+    const apiBase = "https://dev.opendrive.com/api/v1";
+    // ================
+
+    async function getSessionId() {
+      const res = await fetch(`${apiBase}/session/login.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `username=${encodeURIComponent(username)}&passwd=${encodeURIComponent(password)}`
+      });
+      const data = await res.json();
+      return data.SessionID;
+    }
+
+    async function getStreamingLink(sessionId) {
+      const res = await fetch(`${apiBase}/file/streaminglink.json/${fileId}?session_id=${sessionId}`);
+      const data = await res.json();
+      return data.StreamingLink;
+    }
+
+    (async () => {
+      try {
+        const sessionId = await getSessionId();
+        const link = await getStreamingLink(sessionId);
+        window.location.href = link;
+      } catch (err) {
+        document.body.innerHTML = "<p>링크를 불러오지 못했습니다.</p>";
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
